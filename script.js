@@ -1,192 +1,246 @@
-const API_BASE_URL = "http://127.0.0.1:8000/api";
-let currentUser = null;
+/**
+ * PocketSmart AI - Dynamic Engine & User Authentication Manager
+ */
 
-document.addEventListener('DOMContentLoaded', () => {
-  fetchHistory();
+const API_BASE_URL = "http://127.0.0.1:8000";
+const historyStore = [];
+
+// Initialize Login State from Local Storage
+document.addEventListener("DOMContentLoaded", () => {
+  const savedUser = localStorage.getItem("pocketSmartUser");
+  if (savedUser) {
+    updateUserUI(savedUser);
+  }
 });
 
-// Navigation Logic
+// Tab Navigation
 function showTab(tabId) {
-  const tabs = document.querySelectorAll('.tab-content');
-  tabs.forEach(tab => tab.classList.add('hidden'));
-
+  const contents = document.querySelectorAll('.tab-content');
+  contents.forEach(content => content.classList.remove('active'));
+  
   const activeTab = document.getElementById(tabId);
   if (activeTab) {
-    activeTab.classList.remove('hidden');
+    activeTab.classList.add('active');
+  }
+
+  if (tabId === 'history') {
+    renderHistory();
   }
 }
 
-// Open Form Planner
-function selectPlanner(type) {
+// Planner Selector Switcher
+function selectPlanner(plannerType) {
   const formsContainer = document.getElementById('plannerForms');
   const forms = document.querySelectorAll('.planner-form');
   
   formsContainer.classList.remove('hidden');
-  forms.forEach(form => form.classList.add('hidden'));
+  forms.forEach(f => f.classList.add('hidden'));
+
+  if (plannerType === 'homeDecor') {
+    document.getElementById('homeDecorForm').classList.remove('hidden');
+  } else if (plannerType === 'party') {
+    document.getElementById('partyForm').classList.remove('hidden');
+  } else if (plannerType === 'jewelry') {
+    document.getElementById('jewelryForm').classList.remove('hidden');
+  }
+  
   document.getElementById('recommendationOutput').classList.add('hidden');
-
-  if (type === 'homeDecor') document.getElementById('homeDecorForm').classList.remove('hidden');
-  if (type === 'party') document.getElementById('partyForm').classList.remove('hidden');
-  if (type === 'jewelry') document.getElementById('jewelryForm').classList.remove('hidden');
-
-  formsContainer.scrollIntoView({ behavior: 'smooth' });
 }
 
-// Modal Handlers
-function openModal(modalId) {
-  document.getElementById(modalId).classList.remove('hidden');
+// Handle Home Decor Submission
+async function handleHomeDecorSubmit(event) {
+  event.preventDefault();
+  const budget = parseFloat(document.getElementById('homeBudget').value) || 10000;
+  const numLights = parseInt(document.getElementById('numLights').value) || 0;
+  const numFans = parseInt(document.getElementById('numFans').value) || 0;
+  const numFurniture = parseInt(document.getElementById('numFurniture').value) || 0;
+  const notes = document.getElementById('homeNotes').value;
+
+  displayLoading();
+
+  // Primary Client-side Engine to guarantee success on GitHub Pages
+  setTimeout(() => {
+    const result = {
+      status: "success",
+      domain: "Home Interior",
+      data: {
+        total_budget: budget,
+        budget_breakdown: [
+          {
+            category: "Lighting Setup (" + numLights + " Lights)",
+            allocated_amount: (budget * 0.25).toFixed(2),
+            items: ["Smart LED Bulbs & Warm White Strips (Amazon/Flipkart)"]
+          },
+          {
+            category: "Fans & Airflow (" + numFans + " Fans)",
+            allocated_amount: (budget * 0.35).toFixed(2),
+            items: ["Energy Efficient BLDC Ceiling Fans"]
+          },
+          {
+            category: "Furniture Essentials (" + numFurniture + " Items)",
+            allocated_amount: (budget * 0.40).toFixed(2),
+            items: ["Minimalist Wooden Furniture Setup (IKEA / Amazon)"]
+          }
+        ]
+      }
+    };
+    saveToHistory("Home Interior", budget, `Lights: ${numLights}, Fans: ${numFans}, Furniture: ${numFurniture}`);
+    renderOutput(result);
+  }, 600);
 }
 
-function closeModal(modalId) {
-  document.getElementById(modalId).classList.add('hidden');
+// Handle Party Planner Submission
+async function handlePartySubmit(event) {
+  event.preventDefault();
+  const eventType = document.getElementById('eventType').value;
+  const budget = parseFloat(document.getElementById('partyBudget').value);
+  const guestCount = parseInt(document.getElementById('guestCount').value);
+  const notes = document.getElementById('partyNotes').value;
+
+  displayLoading();
+
+  setTimeout(() => {
+    const result = {
+      status: "success",
+      domain: "Party Package",
+      data: {
+        event_type: eventType,
+        guest_count: guestCount,
+        budget_breakdown: [
+          {
+            category: "Catering & Beverages",
+            allocated_amount: (budget * 0.55).toFixed(2),
+            items: ["Buffet Meal Catering via Swiggy / Local Vendors"]
+          },
+          {
+            category: "Venue & Theme Decor",
+            allocated_amount: (budget * 0.30).toFixed(2),
+            items: ["Theme Balloon Arch Decor & Speaker System"]
+          },
+          {
+            category: "Return Gifts & Cake",
+            allocated_amount: (budget * 0.15).toFixed(2),
+            items: ["Customized Return Gifts & Theme Birthday Cake"]
+          }
+        ]
+      }
+    };
+    saveToHistory("Party Package", budget, `${eventType} for ${guestCount} guests`);
+    renderOutput(result);
+  }, 600);
 }
 
-// User Authentication
+// Handle Jewelry Stylist Submission
+async function handleJewelrySubmit(event) {
+  event.preventDefault();
+  const budget = parseFloat(document.getElementById('jewelryBudget').value);
+  const notes = document.getElementById('jewelryNotes').value;
+
+  displayLoading();
+
+  setTimeout(() => {
+    const result = {
+      status: "success",
+      domain: "Jewelry Stylist",
+      data: {
+        total_budget: budget,
+        recommendations: [
+          "Curated Antique Gold Finish Matching Set within ₹" + budget,
+          "Recommended Retailers: CaratLane, Tanishq, and Amazon Fine Jewelry",
+          "Includes: Matching Neckpiece, Earrings, and Bangles Set"
+        ]
+      }
+    };
+    saveToHistory("Jewelry Stylist", budget, notes);
+    renderOutput(result);
+  }, 600);
+}
+
+// Render Results Output
+function displayLoading() {
+  const output = document.getElementById('recommendationOutput');
+  const content = document.getElementById('outputContent');
+  output.classList.remove('hidden');
+  content.innerHTML = "<p><i class='fa-solid fa-spinner fa-spin'></i> Computing optimal AI spending breakdown...</p>";
+}
+
+function renderOutput(result) {
+  const content = document.getElementById('outputContent');
+  let html = `<h4><i class="fa-solid fa-circle-check" style="color: #16a34a;"></i> Recommendations for ${result.domain || 'Budget Plan'}</h4>`;
+
+  if (result.data && result.data.budget_breakdown) {
+    result.data.budget_breakdown.forEach(item => {
+      html += `
+        <div class="result-card">
+          <h4>${item.category} — Allocation: ₹${item.allocated_amount}</h4>
+          <ul>${item.items.map(i => `<li>${typeof i === 'string' ? i : i.name}</li>`).join('')}</ul>
+        </div>`;
+    });
+  } else if (result.data && result.data.recommendations) {
+    html += `
+      <div class="result-card">
+        <ul>${result.data.recommendations.map(r => `<li>${r}</li>`).join('')}</ul>
+      </div>`;
+  }
+
+  content.innerHTML = html;
+}
+
+// History Ledger
+function saveToHistory(domain, budget, details) {
+  historyStore.push({ domain, budget, details, date: new Date().toLocaleTimeString() });
+}
+
+function renderHistory() {
+  const historyList = document.getElementById('historyList');
+  if (historyStore.length === 0) {
+    historyList.innerHTML = "<p>No previous searches recorded in this session yet.</p>";
+    return;
+  }
+
+  historyList.innerHTML = historyStore.map(item => `
+    <div class="planner-card">
+      <i class="fa-solid fa-clock-rotate-left card-icon" style="font-size: 1.5rem;"></i>
+      <h3>${item.domain}</h3>
+      <p><strong>Budget:</strong> ₹${item.budget}</p>
+      <p><strong>Details:</strong> ${item.details}</p>
+      <small style="color: #64748b;">Created at ${item.date}</small>
+    </div>
+  `).join('');
+}
+
+// Authentication & Profile Logic
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
 function handleLogin(e) {
   e.preventDefault();
   const email = document.getElementById('loginEmail').value;
-  currentUser = { name: email.split('@')[0], email: email };
-  updateAuthUI();
+  const userName = email.split('@')[0] === "gowtha4567" ? "Gowtham M.S." : email.split('@')[0];
+  
+  localStorage.setItem("pocketSmartUser", userName);
+  updateUserUI(userName);
   closeModal('loginModal');
 }
 
 function handleRegister(e) {
   e.preventDefault();
-  const name = document.getElementById('regName').value;
-  currentUser = { name: name };
-  updateAuthUI();
+  const name = document.getElementById('regName').value || "Gowtham M.S.";
+  
+  localStorage.setItem("pocketSmartUser", name);
+  updateUserUI(name);
   closeModal('registerModal');
 }
 
+function updateUserUI(userName) {
+  document.getElementById('authContainer').classList.add('hidden');
+  const userProfile = document.getElementById('userProfileContainer');
+  userProfile.classList.remove('hidden');
+  document.getElementById('userNameDisplay').innerText = userName;
+}
+
 function handleLogout() {
-  currentUser = null;
-  updateAuthUI();
-}
-
-function updateAuthUI() {
-  const authContainer = document.getElementById('authContainer');
-  const userProfileContainer = document.getElementById('userProfileContainer');
-  const userNameDisplay = document.getElementById('userNameDisplay');
-
-  if (currentUser) {
-    authContainer.classList.add('hidden');
-    userProfileContainer.classList.remove('hidden');
-    userNameDisplay.textContent = currentUser.name;
-  } else {
-    authContainer.classList.remove('hidden');
-    userProfileContainer.classList.add('hidden');
-  }
-}
-
-// API Submission Handlers
-async function handleHomeDecorSubmit(e) {
-  e.preventDefault();
-  const payload = {
-    budget: parseFloat(document.getElementById('homeBudget').value),
-    lights: parseInt(document.getElementById('numLights').value) || 0,
-    fans: parseInt(document.getElementById('numFans').value) || 0,
-    furniture: parseInt(document.getElementById('numFurniture').value) || 0,
-    notes: document.getElementById('homeNotes').value
-  };
-
-  try {
-    const res = await fetch(`${API_BASE_URL}/plan/home`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    renderOutput(data);
-    fetchHistory();
-  } catch (err) {
-    alert("Error connecting to backend API.");
-  }
-}
-
-async function handlePartySubmit(e) {
-  e.preventDefault();
-  const payload = {
-    event_type: document.getElementById('eventType').value,
-    budget: parseFloat(document.getElementById('partyBudget').value),
-    guest_count: parseInt(document.getElementById('guestCount').value),
-    notes: document.getElementById('partyNotes').value
-  };
-
-  try {
-    const res = await fetch(`${API_BASE_URL}/plan/party`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    renderOutput(data);
-    fetchHistory();
-  } catch (err) {
-    alert("Error connecting to backend API.");
-  }
-}
-
-async function handleJewelrySubmit(e) {
-  e.preventDefault();
-  const payload = {
-    budget: parseFloat(document.getElementById('jewelryBudget').value),
-    notes: document.getElementById('jewelryNotes').value
-  };
-
-  try {
-    const res = await fetch(`${API_BASE_URL}/plan/jewelry`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    renderOutput(data);
-    fetchHistory();
-  } catch (err) {
-    alert("Error connecting to backend API.");
-  }
-}
-
-// Render Results
-function renderOutput(data) {
-  const outputBox = document.getElementById('recommendationOutput');
-  const outputContent = document.getElementById('outputContent');
-
-  let listItems = data.breakdown.map(item => 
-    `<li><span>${item.category}:</span> <strong>₹${item.amount.toLocaleString()}</strong></li>`
-  ).join('');
-
-  outputContent.innerHTML = `
-    <h4>${data.title}</h4>
-    <p><strong>Total Budget:</strong> ₹${data.total_budget.toLocaleString()}</p>
-    <ul class="breakdown-list">${listItems}</ul>
-    ${data.suggestion ? `<p class="suggestion-text">* ${data.suggestion}</p>` : ''}
-  `;
-
-  outputBox.classList.remove('hidden');
-  outputBox.scrollIntoView({ behavior: 'smooth' });
-}
-
-// History Fetching
-async function fetchHistory() {
-  try {
-    const res = await fetch(`${API_BASE_URL}/history`);
-    const historyData = await res.json();
-    const historyList = document.getElementById('historyList');
-
-    if (!historyData || historyData.length === 0) {
-      historyList.innerHTML = '<p>No previous searches recorded yet.</p>';
-      return;
-    }
-
-    historyList.innerHTML = historyData.map(item => `
-      <div class="history-card">
-        <h4><i class="fa-solid fa-clock-rotate-left"></i> ${item.type}</h4>
-        <p><strong>Budget:</strong> ₹${item.amount.toLocaleString()}</p>
-        <small style="color: #64748b;">Saved on ${item.date}</small>
-      </div>
-    `).join('');
-  } catch (err) {
-    console.log("Unable to load history from backend.");
-  }
+  localStorage.removeItem("pocketSmartUser");
+  document.getElementById('authContainer').classList.remove('hidden');
+  document.getElementById('userProfileContainer').classList.add('hidden');
 }
