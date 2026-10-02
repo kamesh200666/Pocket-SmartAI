@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PocketSmart AI - Smart Budget Assistant</title>
+  <title>PocketSmart AI - Smart Budget & Recommendation Assistant</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
@@ -13,7 +13,7 @@
   <nav class="navbar">
     <div class="nav-container">
       <a href="#" class="logo"><i class="fa-solid fa-wallet"></i> PocketSmart <span>AI</span></a>
-      <ul class="nav-links">
+      <ul class="nav-links" id="navLinks">
         <li><a href="#home" onclick="showTab('home')">Home</a></li>
         <li><a href="#planners" onclick="showTab('planners')">Planners</a></li>
         <li><a href="#history" onclick="showTab('history')">History</a></li>
@@ -30,19 +30,19 @@
       <div class="user-profile hidden" id="userProfileContainer">
         <div class="profile-info">
           <i class="fa-solid fa-circle-user profile-icon"></i>
-          <span id="userNameDisplay">User</span>
+          <span id="userNameDisplay">Gowtham M.S.</span>
         </div>
         <button class="btn btn-outline btn-sm" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
       </div>
     </div>
   </nav>
 
-  <!-- Home Section -->
+  <!-- Hero / Home Section -->
   <section id="home" class="tab-content active">
     <header class="hero">
       <div class="hero-content">
         <h1>AI-Powered Budget Planning for Everyday Needs</h1>
-        <p>Make smarter financial decisions with personalized recommendations for home interiors, party setups, and jewelry purchases.</p>
+        <p>Make smarter financial decisions with personalized recommendations for home interiors, party setups, and jewelry purchases within your budget constraints.</p>
         <div class="hero-actions">
           <button class="btn btn-primary btn-lg" onclick="showTab('planners')">Explore Planners</button>
           <button class="btn btn-outline btn-lg" onclick="showTab('testimonials')">Learn More</button>
@@ -52,50 +52,53 @@
   </section>
 
   <!-- Planners Section -->
-  <section id="planners" class="tab-content container hidden">
-    <h2 class="section-title">Smart Budget Planners</h2>
-    <p class="section-subtitle">Select a planner below to generate optimized spending breakdowns.</p>
+  <section id="planners" class="tab-content container">
+    <h2 class="section-title">Our Smart Budget Planners</h2>
+    <p class="section-subtitle">Select a planner below to generate optimized AI spending breakdowns.</p>
 
     <div class="planner-grid">
+      <!-- Home Decor Card -->
       <div class="planner-card">
         <i class="fa-solid fa-house-laptop card-icon"></i>
         <h3>Home Interior Planner</h3>
-        <p>Recommendations for furniture, lights, and appliances within your budget.</p>
+        <p>Recommendations for furniture, lights, and appliances tailored to your room count and budget constraints.</p>
         <button class="btn btn-primary" onclick="selectPlanner('homeDecor')">Open Planner</button>
       </div>
 
+      <!-- Party Budget Card -->
       <div class="planner-card">
         <i class="fa-solid fa-champagne-glasses card-icon"></i>
         <h3>Party Budget Planner</h3>
-        <p>Plan catering, venue, and decor for events within your limit.</p>
+        <p>Plan catering, venue allocations, and decor for events staying strictly within your financial limit.</p>
         <button class="btn btn-primary" onclick="selectPlanner('party')">Open Planner</button>
       </div>
 
+      <!-- Jewelry Planner Card -->
       <div class="planner-card">
         <i class="fa-solid fa-gem card-icon"></i>
         <h3>Jewelry Budget Planner</h3>
-        <p>Match your outfit styles and price limits with curated jewelry plans.</p>
+        <p>Match your outfit styles, occasions, and price limits with curated jewelry recommendations.</p>
         <button class="btn btn-primary" onclick="selectPlanner('jewelry')">Open Planner</button>
       </div>
     </div>
 
     <!-- Active Form Container -->
     <div id="plannerForms" class="form-container hidden">
-      <!-- Home Form -->
+      <!-- Home Decor Form -->
       <form id="homeDecorForm" class="planner-form hidden" onsubmit="handleHomeDecorSubmit(event)">
         <h3><i class="fa-solid fa-house"></i> Home Interior Budget Form</h3>
         <div class="form-group">
-          <label for="homeBudget">Total Budget (₹)</label>
-          <input type="number" id="homeBudget" required placeholder="e.g. 10000">
+          <label>Total Budget (₹)</label>
+          <input type="number" id="homeBudget" required placeholder="e.g. 10000" value="10000">
         </div>
         <div class="form-row">
-          <div class="form-group"><label for="numLights">Lights</label><input type="number" id="numLights" value="5" min="0"></div>
-          <div class="form-group"><label for="numFans">Fans</label><input type="number" id="numFans" value="3" min="0"></div>
-          <div class="form-group"><label for="numFurniture">Furniture</label><input type="number" id="numFurniture" value="2" min="0"></div>
+          <div class="form-group"><label>Lights</label><input type="number" id="numLights" value="5" min="0"></div>
+          <div class="form-group"><label>Fans</label><input type="number" id="numFans" value="3" min="0"></div>
+          <div class="form-group"><label>Furniture</label><input type="number" id="numFurniture" value="2" min="0"></div>
         </div>
         <div class="form-group">
-          <label for="homeNotes">Additional Requirements</label>
-          <textarea id="homeNotes" rows="3" placeholder="e.g. Minimalist design"></textarea>
+          <label>Additional Requirements</label>
+          <textarea id="homeNotes" rows="3" placeholder="e.g. Minimalist design, wooden finish from IKEA or Amazon"></textarea>
         </div>
         <button type="submit" class="btn btn-primary btn-block">Generate Home Recommendations</button>
       </form>
@@ -104,16 +107,16 @@
       <form id="partyForm" class="planner-form hidden" onsubmit="handlePartySubmit(event)">
         <h3><i class="fa-solid fa-cake-candles"></i> Party Package Budget Form</h3>
         <div class="form-group">
-          <label for="eventType">Event Type</label>
-          <input type="text" id="eventType" required placeholder="e.g. Birthday Celebration">
+          <label>Event Type</label>
+          <input type="text" id="eventType" required placeholder="e.g. Birthday Celebration" value="Birthday Celebration">
         </div>
         <div class="form-row">
-          <div class="form-group"><label for="partyBudget">Total Budget (₹)</label><input type="number" id="partyBudget" required placeholder="45000"></div>
-          <div class="form-group"><label for="guestCount">Guest Count</label><input type="number" id="guestCount" required placeholder="35"></div>
+          <div class="form-group"><label>Total Budget (₹)</label><input type="number" id="partyBudget" required placeholder="45000" value="45000"></div>
+          <div class="form-group"><label>Guest Count</label><input type="number" id="guestCount" required placeholder="35" value="35"></div>
         </div>
         <div class="form-group">
-          <label for="partyNotes">Additional Requirements</label>
-          <textarea id="partyNotes" rows="3" placeholder="e.g. Buffet catering"></textarea>
+          <label>Additional Requirements</label>
+          <textarea id="partyNotes" rows="3" placeholder="e.g. Buffet catering, balloon theme"></textarea>
         </div>
         <button type="submit" class="btn btn-primary btn-block">Generate Party Recommendations</button>
       </form>
@@ -122,12 +125,12 @@
       <form id="jewelryForm" class="planner-form hidden" onsubmit="handleJewelrySubmit(event)">
         <h3><i class="fa-solid fa-gem"></i> Jewelry Stylist Form</h3>
         <div class="form-group">
-          <label for="jewelryBudget">Budget Limit (₹)</label>
-          <input type="number" id="jewelryBudget" required placeholder="35000">
+          <label>Budget Limit (₹)</label>
+          <input type="number" id="jewelryBudget" required placeholder="35000" value="35000">
         </div>
         <div class="form-group">
-          <label for="jewelryNotes">Outfit Style & Occasion</label>
-          <textarea id="jewelryNotes" rows="3" required placeholder="e.g. Silk Saree matching set"></textarea>
+          <label>Outfit Style & Occasion</label>
+          <textarea id="jewelryNotes" rows="3" required placeholder="e.g. South Indian Silk Saree matching set, Antique Gold finish"></textarea>
         </div>
         <button type="submit" class="btn btn-primary btn-block">Generate Styling Suggestions</button>
       </form>
@@ -150,48 +153,47 @@
 
   <!-- Testimonials Section -->
   <section id="testimonials" class="tab-content container hidden">
-    <h2 class="section-title">User Reviews</h2>
+    <h2 class="section-title">User Reviews & Success Stories</h2>
     <div class="testimonial-grid">
       <div class="testimonial-card">
         <p>"PocketSmart AI helped me furnish my room within ₹10,000 without missing any essentials."</p>
         <h4>- Ananya Sharma</h4>
       </div>
       <div class="testimonial-card">
-        <p>"Organizing my sister's birthday was effortless. The venue breakdown matched our exact budget."</p>
+        <p>"Organizing my sister's birthday was effortless. The Swiggy and venue breakdown matched our exact budget."</p>
         <h4>- Rajesh Kumar</h4>
       </div>
     </div>
   </section>
 
-  <!-- Login Modal -->
+  <!-- Authentication Modals -->
   <div id="loginModal" class="modal hidden">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
       <h2>Login to PocketSmart AI</h2>
       <form onsubmit="handleLogin(event)">
-        <div class="form-group"><label for="loginEmail">Email</label><input type="email" id="loginEmail" required></div>
-        <div class="form-group"><label for="loginPassword">Password</label><input type="password" id="loginPassword" required></div>
+        <div class="form-group"><label>Email</label><input type="email" id="loginEmail" required value="gowtha4567@gmail.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="loginPassword" required value="••••••••••••"></div>
         <button type="submit" class="btn btn-primary btn-block">Login</button>
       </form>
     </div>
   </div>
 
-  <!-- Register Modal -->
   <div id="registerModal" class="modal hidden">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('registerModal')">&times;</span>
       <h2>Create an Account</h2>
       <form onsubmit="handleRegister(event)">
-        <div class="form-group"><label for="regName">Full Name</label><input type="text" id="regName" required></div>
-        <div class="form-group"><label for="regEmail">Email</label><input type="email" id="regEmail" required></div>
-        <div class="form-group"><label for="regPassword">Password</label><input type="password" id="regPassword" required></div>
+        <div class="form-group"><label>Full Name</label><input type="text" id="regName" required value="kamesh D"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="regEmail" required value="kameshkamesh6974@gmail.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="regPassword" required></div>
         <button type="submit" class="btn btn-primary btn-block">Register</button>
       </form>
     </div>
   </div>
 
   <footer>
-    <p>&copy; 2026 PocketSmart AI. Smart Financial Planning.</p>
+    <p>&copy; 2026 PocketSmart AI. Built for Smart Financial Planning.</p>
   </footer>
 
   <script src="script.js"></script>
