@@ -1,64 +1,60 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
 :root {
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --secondary: #0f172a;
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --secondary-color: #0f172a;
   --bg-color: #f8fafc;
   --card-bg: #ffffff;
-  --text-main: #334155;
-  --text-muted: #64748b;
-  --border: #e2e8f0;
+  --text-color: #334155;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
   background-color: var(--bg-color);
-  color: var(--text-main);
+  color: var(--text-color);
   line-height: 1.6;
 }
 
 .container {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
 }
 
-.hidden {
-  display: none !important;
-}
-
-/* Navbar */
+/* Navbar & User Profile Header */
 .navbar {
-  background-color: var(--card-bg);
-  border-bottom: 1px solid var(--border);
+  background: var(--card-bg);
+  box-shadow: var(--box-shadow);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
 }
 
 .nav-container {
-  max-width: 1100px;
-  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 1rem;
 }
 
 .logo {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-color);
   text-decoration: none;
 }
 
 .logo span {
-  color: var(--primary);
+  color: var(--primary-color);
 }
 
 .nav-links {
@@ -69,16 +65,17 @@ body {
 
 .nav-links a {
   text-decoration: none;
-  color: var(--text-muted);
-  font-weight: 500;
-  transition: color 0.3s;
+  color: var(--text-color);
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .nav-links a:hover {
-  color: var(--primary);
+  color: var(--primary-color);
 }
 
-.auth-buttons, .user-profile {
+/* User Profile Badge */
+.user-profile {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -88,23 +85,33 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--secondary-color);
+}
+
+.profile-icon {
+  font-size: 1.6rem;
+  color: var(--primary-color);
 }
 
 /* Buttons */
 .btn {
   padding: 0.6rem 1.2rem;
-  border-radius: 6px;
+  border-radius: var(--border-radius);
   border: none;
-  cursor: pointer;
   font-weight: 600;
-  font-size: 0.9rem;
-  transition: all 0.2s;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
 }
 
 .btn-primary {
-  background-color: var(--primary);
-  color: white;
+  background-color: var(--primary-color);
+  color: #fff;
 }
 
 .btn-primary:hover {
@@ -112,32 +119,29 @@ body {
 }
 
 .btn-outline {
-  background-color: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-main);
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
 }
 
 .btn-outline:hover {
-  background-color: #f1f5f9;
-}
-
-.btn-lg {
-  padding: 0.8rem 1.6rem;
-  font-size: 1rem;
-}
-
-.btn-sm {
-  padding: 0.4rem 0.8rem;
-  font-size: 0.8rem;
+  background-color: var(--primary-color);
+  color: #fff;
 }
 
 .btn-block {
   width: 100%;
 }
 
-/* Hero */
+.btn-lg {
+  padding: 0.8rem 1.8rem;
+  font-size: 1rem;
+}
+
+/* Hero Section */
 .hero {
-  background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  color: white;
   padding: 5rem 1rem;
   text-align: center;
 }
@@ -149,83 +153,56 @@ body {
 
 .hero h1 {
   font-size: 2.5rem;
-  color: var(--secondary);
   margin-bottom: 1rem;
 }
 
-.hero p {
-  font-size: 1.1rem;
-  color: var(--text-muted);
-  margin-bottom: 2rem;
-}
-
 .hero-actions {
+  margin-top: 2rem;
   display: flex;
-  justify-content: center;
   gap: 1rem;
+  justify-content: center;
 }
 
-/* Planners */
+/* Cards & Grid */
 .section-title {
   text-align: center;
-  font-size: 1.8rem;
-  color: var(--secondary);
+  font-size: 2rem;
   margin-bottom: 0.5rem;
 }
 
 .section-subtitle {
   text-align: center;
-  color: var(--text-muted);
+  color: #64748b;
   margin-bottom: 2rem;
 }
 
-.planner-grid {
+.planner-grid, .history-grid, .testimonial-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 2.5rem;
 }
 
-.planner-card {
+.planner-card, .testimonial-card {
   background: var(--card-bg);
   padding: 2rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   text-align: center;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .card-icon {
   font-size: 2.5rem;
-  color: var(--primary);
+  color: var(--primary-color);
   margin-bottom: 1rem;
-}
-
-.planner-card h3 {
-  margin-bottom: 0.5rem;
-  color: var(--secondary);
-}
-
-.planner-card p {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-bottom: 1.5rem;
 }
 
 /* Forms */
 .form-container {
+  margin-top: 2rem;
   background: var(--card-bg);
   padding: 2rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  margin-top: 1rem;
-}
-
-.planner-form h3 {
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
 }
 
 .form-group {
@@ -235,98 +212,62 @@ body {
 .form-group label {
   display: block;
   margin-bottom: 0.4rem;
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .form-group input, .form-group textarea {
   width: 100%;
-  padding: 0.6rem 0.8rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 0.95rem;
+  padding: 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--border-radius);
 }
 
 .form-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  display: flex;
   gap: 1rem;
 }
 
-/* Output Box */
+/* Recommendation Results Box */
 .output-box {
   margin-top: 2rem;
   padding: 1.5rem;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  border-radius: 8px;
+  background: #eff6ff;
+  border-left: 4px solid var(--primary-color);
+  border-radius: var(--border-radius);
 }
 
-.output-box h3 {
-  color: #166534;
-  margin-bottom: 1rem;
+.result-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.breakdown-list {
-  list-style: none;
-  margin: 1rem 0;
+.result-card h4 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
 }
 
-.breakdown-list li {
-  padding: 0.5rem 0;
-  border-bottom: 1px dashed #cbd5e1;
-  display: flex;
-  justify-content: space-between;
+.result-card ul {
+  padding-left: 1.2rem;
 }
 
-.suggestion-text {
-  font-size: 0.85rem;
-  color: #15803d;
-  margin-top: 0.5rem;
-}
-
-/* History & Testimonials */
-.history-grid, .testimonial-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-.history-card, .testimonial-card {
-  background: var(--card-bg);
-  padding: 1.5rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-}
-
-.testimonial-card p {
-  font-style: italic;
-  margin-bottom: 1rem;
-}
-
-.testimonial-card h4 {
-  color: var(--primary);
-}
-
-/* Modal */
+/* Modals */
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
+  justify-content: center;
+  z-index: 2000;
 }
 
 .modal-content {
-  background: white;
+  background: var(--card-bg);
   padding: 2rem;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   width: 100%;
   max-width: 400px;
   position: relative;
@@ -334,16 +275,27 @@ body {
 
 .close-btn {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 10px; right: 15px;
   font-size: 1.5rem;
   cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
 }
 
 footer {
   text-align: center;
   padding: 2rem;
-  border-top: 1px solid var(--border);
-  color: var(--text-muted);
+  background: var(--secondary-color);
+  color: white;
   margin-top: 3rem;
 }
