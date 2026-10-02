@@ -1,127 +1,192 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional, List
+const API_BASE_URL = "http://127.0.0.1:8000/api";
+let currentUser = null;
 
-app = FastAPI(title="PocketSmart AI API", version="1.0.0")
+document.addEventListener('DOMContentLoaded', () => {
+  fetchHistory();
+});
 
-# CORS Setup - Frontend connect aaga
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # GitHub Pages matrum local testings ku allow pannum
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+// Navigation Logic
+function showTab(tabId) {
+  const tabs = document.querySelectorAll('.tab-content');
+  tabs.forEach(tab => tab.classList.add('hidden'));
 
-# Request Models
-class HomeDecorRequest(BaseModel):
-    budget: float
-    num_lights: Optional[int] = 0
-    num_fans: Optional[int] = 0
-    num_furniture: Optional[int] = 0
-    notes: Optional[str] = ""
+  const activeTab = document.getElementById(tabId);
+  if (activeTab) {
+    activeTab.classList.remove('hidden');
+  }
+}
 
-class PartyRequest(BaseModel):
-    event_type: str
-    budget: float
-    guest_count: int
-    notes: Optional[str] = ""
+// Open Form Planner
+function selectPlanner(type) {
+  const formsContainer = document.getElementById('plannerForms');
+  const forms = document.querySelectorAll('.planner-form');
+  
+  formsContainer.classList.remove('hidden');
+  forms.forEach(form => form.classList.add('hidden'));
+  document.getElementById('recommendationOutput').classList.add('hidden');
 
-class JewelryRequest(BaseModel):
-    budget: float
-    notes: str
+  if (type === 'homeDecor') document.getElementById('homeDecorForm').classList.remove('hidden');
+  if (type === 'party') document.getElementById('partyForm').classList.remove('hidden');
+  if (type === 'jewelry') document.getElementById('jewelryForm').classList.remove('hidden');
 
-# Endpoints
-@app.get("/")
-def read_root():
-    return {"message": "PocketSmart AI Backend is Running Successfully!"}
+  formsContainer.scrollIntoView({ behavior: 'smooth' });
+}
 
-@app.post("/recommend/home-decor")
-def recommend_home_decor(req: HomeDecorRequest):
-    try:
-        total = req.budget
-        breakdown = [
-            {
-                "category": f"Lighting Setup ({req.num_lights} Lights)",
-                "allocated_amount": round(total * 0.25, 2),
-                "items": ["Smart LED Bulbs & Warm White Strips"]
-            },
-            {
-                "category": f"Fans & Airflow ({req.num_fans} Fans)",
-                "allocated_amount": round(total * 0.35, 2),
-                "items": ["BLDC Energy Saving Ceiling Fans"]
-            },
-            {
-                "category": f"Furniture Essentials ({req.num_furniture} Items)",
-                "allocated_amount": round(total * 0.40, 2),
-                "items": ["Minimalist Wooden Furniture Essentials"]
-            }
-        ]
-        return {
-            "status": "success",
-            "domain": "Home Interior",
-            "data": {
-                "total_budget": total,
-                "budget_breakdown": breakdown
-            }
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+// Modal Handlers
+function openModal(modalId) {
+  document.getElementById(modalId).classList.remove('hidden');
+}
 
-@app.post("/recommend/party")
-def recommend_party(req: PartyRequest):
-    try:
-        total = req.budget
-        breakdown = [
-            {
-                "category": "Catering & Refreshments",
-                "allocated_amount": round(total * 0.55, 2),
-                "items": [f"Buffet meals for {req.guest_count} guests"]
-            },
-            {
-                "category": "Venue & Decoration",
-                "allocated_amount": round(total * 0.30, 2),
-                "items": ["Theme Balloon Arch & Sound Setup"]
-            },
-            {
-                "category": "Cake & Return Gifts",
-                "allocated_amount": round(total * 0.15, 2),
-                "items": ["Custom Birthday Cake & Gift Favors"]
-            }
-        ]
-        return {
-            "status": "success",
-            "domain": "Party Package",
-            "data": {
-                "event_type": req.event_type,
-                "guest_count": req.guest_count,
-                "budget_breakdown": breakdown
-            }
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.add('hidden');
+}
 
-@app.post("/recommend/jewelry")
-def recommend_jewelry(req: JewelryRequest):
-    try:
-        total = req.budget
-        recommendations = [
-            f"Curated Antique Gold Finish Matching Set under ₹{total}",
-            "Recommended Brands: CaratLane, Tanishq, and Fine Jewelry collections",
-            "Set includes: Matching Neckpiece, Earrings, and Bangles"
-        ]
-        return {
-            "status": "success",
-            "domain": "Jewelry Stylist",
-            "data": {
-                "total_budget": total,
-                "recommendations": recommendations
-            }
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+// User Authentication
+function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value;
+  currentUser = { name: email.split('@')[0], email: email };
+  updateAuthUI();
+  closeModal('loginModal');
+}
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+function handleRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('regName').value;
+  currentUser = { name: name };
+  updateAuthUI();
+  closeModal('registerModal');
+}
+
+function handleLogout() {
+  currentUser = null;
+  updateAuthUI();
+}
+
+function updateAuthUI() {
+  const authContainer = document.getElementById('authContainer');
+  const userProfileContainer = document.getElementById('userProfileContainer');
+  const userNameDisplay = document.getElementById('userNameDisplay');
+
+  if (currentUser) {
+    authContainer.classList.add('hidden');
+    userProfileContainer.classList.remove('hidden');
+    userNameDisplay.textContent = currentUser.name;
+  } else {
+    authContainer.classList.remove('hidden');
+    userProfileContainer.classList.add('hidden');
+  }
+}
+
+// API Submission Handlers
+async function handleHomeDecorSubmit(e) {
+  e.preventDefault();
+  const payload = {
+    budget: parseFloat(document.getElementById('homeBudget').value),
+    lights: parseInt(document.getElementById('numLights').value) || 0,
+    fans: parseInt(document.getElementById('numFans').value) || 0,
+    furniture: parseInt(document.getElementById('numFurniture').value) || 0,
+    notes: document.getElementById('homeNotes').value
+  };
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/plan/home`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    renderOutput(data);
+    fetchHistory();
+  } catch (err) {
+    alert("Error connecting to backend API.");
+  }
+}
+
+async function handlePartySubmit(e) {
+  e.preventDefault();
+  const payload = {
+    event_type: document.getElementById('eventType').value,
+    budget: parseFloat(document.getElementById('partyBudget').value),
+    guest_count: parseInt(document.getElementById('guestCount').value),
+    notes: document.getElementById('partyNotes').value
+  };
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/plan/party`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    renderOutput(data);
+    fetchHistory();
+  } catch (err) {
+    alert("Error connecting to backend API.");
+  }
+}
+
+async function handleJewelrySubmit(e) {
+  e.preventDefault();
+  const payload = {
+    budget: parseFloat(document.getElementById('jewelryBudget').value),
+    notes: document.getElementById('jewelryNotes').value
+  };
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/plan/jewelry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    renderOutput(data);
+    fetchHistory();
+  } catch (err) {
+    alert("Error connecting to backend API.");
+  }
+}
+
+// Render Results
+function renderOutput(data) {
+  const outputBox = document.getElementById('recommendationOutput');
+  const outputContent = document.getElementById('outputContent');
+
+  let listItems = data.breakdown.map(item => 
+    `<li><span>${item.category}:</span> <strong>₹${item.amount.toLocaleString()}</strong></li>`
+  ).join('');
+
+  outputContent.innerHTML = `
+    <h4>${data.title}</h4>
+    <p><strong>Total Budget:</strong> ₹${data.total_budget.toLocaleString()}</p>
+    <ul class="breakdown-list">${listItems}</ul>
+    ${data.suggestion ? `<p class="suggestion-text">* ${data.suggestion}</p>` : ''}
+  `;
+
+  outputBox.classList.remove('hidden');
+  outputBox.scrollIntoView({ behavior: 'smooth' });
+}
+
+// History Fetching
+async function fetchHistory() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/history`);
+    const historyData = await res.json();
+    const historyList = document.getElementById('historyList');
+
+    if (!historyData || historyData.length === 0) {
+      historyList.innerHTML = '<p>No previous searches recorded yet.</p>';
+      return;
+    }
+
+    historyList.innerHTML = historyData.map(item => `
+      <div class="history-card">
+        <h4><i class="fa-solid fa-clock-rotate-left"></i> ${item.type}</h4>
+        <p><strong>Budget:</strong> ₹${item.amount.toLocaleString()}</p>
+        <small style="color: #64748b;">Saved on ${item.date}</small>
+      </div>
+    `).join('');
+  } catch (err) {
+    console.log("Unable to load history from backend.");
+  }
+}
